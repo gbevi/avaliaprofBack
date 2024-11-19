@@ -1,13 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { DatabaseService } from 'src/database/database.service';
+import { NotFoundException } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly databaseService: DatabaseService) {}
 
   async create(createUserDto: Prisma.UserCreateInput) {
-    return this.databaseService.user.create({ data: createUserDto });
+    const user = {
+      ...createUserDto,
+      password: await bcrypt.hash(createUserDto.password, 10),
+    };
+    return this.databaseService.user.create({ data: user });
   }
 
   async findAll() {
@@ -15,6 +21,9 @@ export class UsersService {
   }
 
   async findOne(id: string) {
+    if (!id) {
+      throw new NotFoundException('User not found');
+    }
     return this.databaseService.user.findUnique({
       where: {
         id: id,
@@ -33,6 +42,14 @@ export class UsersService {
     return this.databaseService.user.delete({
       where: {
         id: id,
+      },
+    });
+  }
+
+  async findByEmail(email: string) {
+    return this.databaseService.user.findUnique({
+      where: {
+        email: email,
       },
     });
   }
