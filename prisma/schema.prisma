@@ -13,7 +13,17 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   email     String   @unique
   name      String
+  password  String
+}
+
+model Evaluate {
+  id            String      @id @default(uuid())
+  teacherName String
+  subject    String
+  content     String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
