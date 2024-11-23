@@ -18,3 +18,13 @@ model User {
   name      String
   password  String
 }
+
+model Evaluate {
+  id            String      @id @default(uuid())
+  teacherName String
+  subject    String
+  content     String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+}
