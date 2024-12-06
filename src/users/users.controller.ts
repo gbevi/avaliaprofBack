@@ -3,11 +3,13 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, Valid
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/Create-user.dto';
 import { UpdateUserDto } from './dto/Update-user.dto';
-
+import { IsPublic } from 'src/auth/decorators/is-public.decorator';
+@IsPublic()
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @IsPublic()
   @Post()
   create(@Body(ValidationPipe) createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);

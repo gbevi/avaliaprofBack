@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, Valid
 import { EvaluateService } from './evaluate.service';
 import { CreateEvaluateDto } from './dto/create-evaluate.dto';
 import { UpdateEvaluateDto } from './dto/update-evaluate.dto';
+import { IsPublic } from 'src/auth/decorators/is-public.decorator';
 
 
 
@@ -9,11 +10,13 @@ import { UpdateEvaluateDto } from './dto/update-evaluate.dto';
 export class EvaluateController {
     constructor(private readonly evaluateService: EvaluateService) {}
 
+    @IsPublic()
     @Post()
     create(@Body() createEvaluateDto: CreateEvaluateDto){
         return this.evaluateService.create(createEvaluateDto);
     }
 
+    @IsPublic()
     @Get()
     findAll() {
         return this.evaluateService.findAll();
@@ -23,7 +26,7 @@ export class EvaluateController {
     update(@Param('id', ParseUUIDPipe) id: string, @Body(ValidationPipe) updateEvaluateDto: UpdateEvaluateDto) {
         return this.evaluateService.update(id, updateEvaluateDto);
     }
-
+    @IsPublic()
     @Delete(':id')
     remove(@Param('id', ParseUUIDPipe) id: string) {
         return this.evaluateService.remove(id);
