@@ -32,7 +32,7 @@ export class EvaluateService {
     });
   }
   async remove(id: string) {
-    return this.databaseService.user.delete({
+    return this.databaseService.evaluate.delete({
       where: {
         id: id,
       },
@@ -42,7 +42,7 @@ export class EvaluateService {
   async findByTeacher(teacherName: string) {
     return this.databaseService.evaluate.findMany({
       where: {
-        teacherName: teacherName,
+        teacherId: teacherName,
       },
     });
   }

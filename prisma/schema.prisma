@@ -4,27 +4,40 @@
 generator client {
   provider = "prisma-client-js"
 }
-// prisma/schema.prisma
+
 datasource db {
   provider  = "postgresql"
-  url  	    = env("DATABASE_URL")
-  // uncomment next line if you use Prisma <5.10
+  url       = env("DATABASE_URL")
   directUrl = env("DATABASE_URL_UNPOOLED")
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  name      String
-  password  String
+  id       String @id @default(uuid())
+  email    String @unique
+  name     String
+  course  String
+  department String
+  evaluations Evaluate[]
+  password String
 }
 
 model Evaluate {
   id            String      @id @default(uuid())
-  teacherName String
+  teacherId   String   
+  UserId      String 
+  IdUser     User       @relation(fields: [UserId], references: [id])
+  teacher     Teacher  @relation(fields: [teacherId], references: [id]) 
   subject    String
   content     String
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+}
 
+model Teacher{
+  id        String   @id @default(uuid())
+  name      String
+  subjects   String[]
+  evaluations Evaluate[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
