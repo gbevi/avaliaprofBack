@@ -4,7 +4,6 @@ export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
   name: string;
-  curso: string;
 
   @IsEmail()
   email: string;
@@ -12,8 +11,8 @@ export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
   password: string;
-  course
-
+  course: string;
+  department: string;
 
   id?: string;
 }
