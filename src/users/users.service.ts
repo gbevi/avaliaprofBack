@@ -31,10 +31,32 @@ export class UsersService {
     });
   }
 
-  async update(id: string, updateUserDto: Prisma.UserUpdateInput) {
+  async update(
+    id: string,
+    updateUserDto: Prisma.UserUpdateInput & {
+      currentPassword?: string;
+      newPassword?: string;
+    },
+  ) {
+    const { currentPassword, newPassword, ...otherUpdates } = updateUserDto;
+
+    if (currentPassword && newPassword) {
+      // Valida a senha atual
+      const user = await this.databaseService.user.findUnique({
+        where: { id },
+      });
+      if (!user || !(await bcrypt.compare(currentPassword, user.password))) {
+        throw new Error('Senha atual incorreta.');
+      }
+
+      // Hash da nova senha
+      otherUpdates.password = await bcrypt.hash(newPassword, 10);
+    }
+
+    // Atualiza os campos no banco de dados
     return this.databaseService.user.update({
-      where: { id: id },
-      data: updateUserDto,
+      where: { id },
+      data: otherUpdates,
     });
   }
 
