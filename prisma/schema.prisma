@@ -19,6 +19,7 @@ model User {
   department String
   evaluations Evaluate[]
   password String
+  comentarios Comentarios[]
 }
 
 model Evaluate {
@@ -31,6 +32,7 @@ model Evaluate {
   content     String
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+  comentarios   Comentarios[]
 }
 
 model Teacher{
@@ -40,4 +42,15 @@ model Teacher{
   evaluations Evaluate[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Comentarios {
+  id            String      @id @default(uuid())
+  user     User   @relation(fields: [userId], references: [id])
+  userId      String
+  avaliacao   Evaluate @relation(fields: [avaliacaoId], references: [id])
+  avaliacaoId String
+  conteudo    String
+  createdAt   DateTime  @default(now())
+  updateAt    DateTime  @updatedAt
 }
