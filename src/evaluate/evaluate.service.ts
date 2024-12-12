@@ -39,10 +39,18 @@ export class EvaluateService {
     });
   }
 
-  async findByTeacher(teacherName: string) {
+  async findByTeacher(teacherid: string) {
     return this.databaseService.evaluate.findMany({
       where: {
-        teacherId: teacherName,
+        teacherId: teacherid,
+      },
+    });
+  }
+  
+  async findAllByUser(userId: string) {
+    return this.databaseService.evaluate.findMany({
+      where: {
+        UserId: userId,
       },
     });
   }

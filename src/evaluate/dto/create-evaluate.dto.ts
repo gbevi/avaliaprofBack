@@ -11,9 +11,9 @@ export class CreateEvaluateDto {
 
   @IsString()
   @IsNotEmpty()
-  teacher
   teacherId: string;
-  id?: string;
-  IdUser
-  UserId
+  
+  @IsString()
+  @IsNotEmpty()
+  UserId: string;
 }

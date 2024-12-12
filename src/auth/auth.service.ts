@@ -17,6 +17,7 @@ export class AuthService {
       email: user.email,
       sub: user.id,
       name: user.name,
+      id : user.id,
     };
 
     const jwtToken = this.jwtService.sign(payload);
@@ -41,4 +42,9 @@ export class AuthService {
     }
     throw new Error('Invalid email or password');
   }
+  getUserIdFromToken(token: string): string {
+    const decodedToken = this.jwtService.decode(token) as UserPayload; // Decodifica o token
+    return decodedToken.sub; // Retorna o ID do usuário (sub)
+  }
 }
+
