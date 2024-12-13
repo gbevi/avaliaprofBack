@@ -6,6 +6,7 @@ import {
   ValidationPipe,
   Body,
   ParseIntPipe,
+  ParseUUIDPipe,
   Delete,
   Patch,
   UnauthorizedException,
@@ -52,11 +53,26 @@ export class ComentariosController {
     return await this.comentariosService.deleteComentarios(id);
   }
 //Finalizar atualização (Patch) de comentários.
-  @Patch(':id')
-  async update(
-    @Param('id', ParseIntPipe) id: string,
-    @Body(ValidationPipe) data: UpdateComentariosDto,
-  ) {
-    return await this.comentariosService.update(id, data);
+@Patch(':id')
+async updateComentario(
+  @Param('id', ParseUUIDPipe) id: string, // ID como UUID
+  @Body(ValidationPipe) updateComentarioDto: UpdateComentariosDto, // DTO específico para atualização
+  @CurrentUser() currentUser: UserPayload // Usuário autenticado
+) {
+  // Busca o comentário pelo ID
+  const existingComentario = await this.comentariosService.findComentarios(id);
+  
+  // Verifica se o comentário existe
+  if (!existingComentario) {
+    throw new Error(`Comentário com ID ${id} não encontrado`);
   }
-}
+
+  // Verifica se o usuário tem permissão para atualizar o comentário
+  if (existingComentario.userId !== currentUser.id) {
+    throw new Error('Você não tem permissão para atualizar este comentário');
+  }
+
+  // Realiza a atualização
+    return this.comentariosService.update(id, updateComentarioDto);
+    }
+  }
