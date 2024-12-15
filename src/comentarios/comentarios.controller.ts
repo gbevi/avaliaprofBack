@@ -5,7 +5,6 @@ import {
   Param,
   ValidationPipe,
   Body,
-  ParseIntPipe,
   ParseUUIDPipe,
   Delete,
   Patch,
@@ -30,7 +29,6 @@ export class ComentariosController {
     console.log(currentUser);
     console.log(createComentariosDto.userId);
     if (createComentariosDto.userId !== currentUser.id) {
-
       throw new UnauthorizedException(
         'Só é possível criar comentarios para si mesmo',
       );
@@ -52,27 +50,28 @@ export class ComentariosController {
   async deleteComentarios(@Param('id', ParseUUIDPipe) id: string) {
     return await this.comentariosService.deleteComentarios(id);
   }
-//Finalizar atualização (Patch) de comentários.
-@Patch(':id')
-async updateComentario(
-  @Param('id', ParseUUIDPipe) id: string, // ID como UUID
-  @Body(ValidationPipe) updateComentarioDto: UpdateComentariosDto, // DTO específico para atualização
-  @CurrentUser() currentUser: UserPayload // Usuário autenticado
-) {
-  // Busca o comentário pelo ID
-  const existingComentario = await this.comentariosService.findComentarios(id);
-  
-  // Verifica se o comentário existe
-  if (!existingComentario) {
-    throw new Error(`Comentário com ID ${id} não encontrado`);
-  }
+  //Finalizar atualização (Patch) de comentários.
+  @Patch(':id')
+  async updateComentario(
+    @Param('id', ParseUUIDPipe) id: string, // ID como UUID
+    @Body(ValidationPipe) updateComentarioDto: UpdateComentariosDto, // DTO específico para atualização
+    @CurrentUser() currentUser: UserPayload, // Usuário autenticado
+  ) {
+    // Busca o comentário pelo ID
+    const existingComentario =
+      await this.comentariosService.findComentarios(id);
 
-  // Verifica se o usuário tem permissão para atualizar o comentário
-  if (existingComentario.userId !== currentUser.id) {
-    throw new Error('Você não tem permissão para atualizar este comentário');
-  }
-
-  // Realiza a atualização
-    return this.comentariosService.update(id, updateComentarioDto);
+    // Verifica se o comentário existe
+    if (!existingComentario) {
+      throw new Error(`Comentário com ID ${id} não encontrado`);
     }
+
+    // Verifica se o usuário tem permissão para atualizar o comentário
+    if (existingComentario.userId !== currentUser.id) {
+      throw new Error('Você não tem permissão para atualizar este comentário');
+    }
+
+    // Realiza a atualização
+    return this.comentariosService.update(id, updateComentarioDto);
   }
+}

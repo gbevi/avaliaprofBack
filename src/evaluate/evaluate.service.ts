@@ -47,7 +47,7 @@ export class EvaluateService {
       },
     });
   }
-  
+
   async findAllByUser(userId: string) {
     return this.databaseService.evaluate.findMany({
       where: {

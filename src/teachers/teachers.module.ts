@@ -7,7 +7,7 @@ import { SubjectsService } from '../subjects/subjects.service';
 @Module({
   imports: [DatabaseModule],
   controllers: [TeacherController],
-  providers: [TeacherService,SubjectsService],
-  exports: [TeacherService,SubjectsService],
+  providers: [TeacherService, SubjectsService],
+  exports: [TeacherService, SubjectsService],
 })
 export class TeachersModule {}
