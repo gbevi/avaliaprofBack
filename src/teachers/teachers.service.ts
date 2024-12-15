@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
+import { CreateTeacherDto } from './dto/create-teacher.dto';
 import { NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 
@@ -7,9 +8,37 @@ import { Prisma } from '@prisma/client';
 export class TeacherService {
   constructor(private readonly databaseService: DatabaseService) {}
 
-  async create(createTeacherDto: Prisma.TeacherCreateInput) {
+  async create(name: string,department:string, subjectNames?: string[]) {
+    const subjectIds: string[] = [];
+  
+    if (subjectNames && subjectNames.length > 0) {
 
-    return this.databaseService.teacher.create({ data: createTeacherDto });
+      const existingSubjects = await this.databaseService.subject.findMany({
+        where: { name: { in: subjectNames } },
+      });
+
+      subjectIds.push(...existingSubjects.map((subject) => subject.id));
+   
+      const existingNames = existingSubjects.map((subject) => subject.name.toLowerCase());
+      const newSubjects = subjectNames.filter(
+        (name) => !existingNames.includes(name.toLowerCase())
+      );
+
+      for (const newName of newSubjects) {
+        const newSubject = await this.databaseService.subject.create({
+          data: { name: newName },
+        });
+        subjectIds.push(newSubject.id);
+      }
+    }
+  
+    return this.databaseService.teacher.create({
+      data: {
+        name,
+        department,
+        subjects: { connect: subjectIds.map((id) => ({ id })) },
+      },
+    });
   }
 
   async findAll() {
@@ -24,33 +53,44 @@ export class TeacherService {
       where: {
         id: id,
       },
-      include: { evaluations: true },
+      include: { evaluations: true, subjects: true },
     });
   }
 
-  async update(id: string, updateTeacherDto: Prisma.TeacherUpdateInput) {
+  async update(id: string, updateTeacherDto: { name?: string; subjectNames?: string[] }) {
+    const { name, subjectNames } = updateTeacherDto;
+    const subjectIds: string[] = [];
+  
+    if (subjectNames && subjectNames.length > 0) {
+
+      const existingSubjects = await this.databaseService.subject.findMany({
+        where: { name: { in: subjectNames } },
+      });
+  
+      subjectIds.push(...existingSubjects.map((subject) => subject.id));
+  
+      const existingNames = existingSubjects.map((subject) => subject.name.toLowerCase());
+      const newSubjects = subjectNames.filter(
+        (name) => !existingNames.includes(name.toLowerCase())
+      );
+
+      for (const newName of newSubjects) {
+        const newSubject = await this.databaseService.subject.create({
+          data: { name: newName },
+        });
+        subjectIds.push(newSubject.id);
+      }
+    }
+  
     return this.databaseService.teacher.update({
-      where: { id: id },
-      data: updateTeacherDto,
-    });
-  }
-
-  async addSubjectToTeacher(id: string,subject:string, updateTeacherDto: Prisma.TeacherUpdateInput){
-    const teacher = await this.databaseService.teacher.findUnique({
-      where: { id: id },
-    });
-    if (!teacher) {
-      throw new NotFoundException('Teacher not found');
-    }
-    if (teacher.subjects.includes(subject)) {
-      throw new Error('Subject already added to this teacher');
-    }
-    await this.databaseService.teacher.update({
-      where: { id: id },
+      where: { id },
       data: {
-        subjects: {
-          push: subject,
-        },
+        ...(name && { name }), 
+        ...(subjectIds.length > 0 && {
+          subjects: {
+            set: subjectIds.map((id) => ({ id })),
+          },
+        }),
       },
     });
   }
@@ -59,8 +99,8 @@ export class TeacherService {
     return this.databaseService.teacher.findMany({
       where: {
         name: {
-          contains: searchTerm, // Realiza a busca parcial
-          mode: 'insensitive', // Ignora diferenciação entre maiúsculas e minúsculas
+          contains: searchTerm, 
+          mode: 'insensitive', 
         },
       },
       select: {
@@ -74,6 +114,17 @@ export class TeacherService {
     return this.databaseService.teacher.delete({
       where: {
         id: id,
+      },
+    });
+  }
+
+  async addSubjectToTeacher(teacherId: string, subjectId: string) {
+    return this.databaseService.teacher.update({
+      where: { id: teacherId },
+      data: {
+        subjects: {
+          connect: { id: subjectId },
+        },
       },
     });
   }

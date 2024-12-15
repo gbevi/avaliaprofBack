@@ -23,6 +23,7 @@ export class EvaluateService {
       where: {
         id: id,
       },
+      include: { comentarios: true },
     });
   }
   async update(id: string, updateEvaluateDto: Prisma.EvaluateUpdateInput) {

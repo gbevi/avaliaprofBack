@@ -45,11 +45,11 @@ export class ComentariosController {
   }
 
   @Get(':id')
-  async findComentarios(@Param('id', ParseIntPipe) id: string) {
+  async findComentarios(@Param('id', ParseUUIDPipe) id: string) {
     return await this.comentariosService.findComentarios(id);
   }
   @Delete(':id')
-  async deleteComentarios(@Param('id', ParseIntPipe) id: string) {
+  async deleteComentarios(@Param('id', ParseUUIDPipe) id: string) {
     return await this.comentariosService.deleteComentarios(id);
   }
 //Finalizar atualização (Patch) de comentários.

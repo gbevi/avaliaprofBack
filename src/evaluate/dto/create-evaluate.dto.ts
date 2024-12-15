@@ -7,11 +7,12 @@ export class CreateEvaluateDto {
 
   @IsString()
   @IsNotEmpty()
-  subject: string;
+  teacherId: string;
 
   @IsString()
   @IsNotEmpty()
-  teacherId: string;
+  subjectId : string;
+  
   
   @IsString()
   @IsNotEmpty()

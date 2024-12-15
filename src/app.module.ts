@@ -8,11 +8,12 @@ import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { TeachersModule } from './teachers/teachers.module';
+import { SubjectsModule } from './subjects/subjects.module';
 import { ComentariosModule } from './comentarios/comentarios.module';
 
 
 @Module({
-  imports: [DatabaseModule, UsersModule, AuthModule, EvaluateModule, TeachersModule, ComentariosModule, ComentariosModule],
+  imports: [DatabaseModule, UsersModule, AuthModule, EvaluateModule, TeachersModule,ComentariosModule,SubjectsModule],
   controllers: [AppController],
   providers: [
     AppService,
