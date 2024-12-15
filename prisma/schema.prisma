@@ -23,21 +23,31 @@ model User {
 
 model Evaluate {
   id            String      @id @default(uuid())
-  teacherId   String   
-  UserId      String 
-  IdUser     User       @relation(fields: [UserId], references: [id])
-  teacher     Teacher  @relation(fields: [teacherId], references: [id]) 
-  subject    String
-  content     String
+  content       String
+  teacherId     String   
+  UserId        String 
+  subjectId     String
+  subject       Subject    @relation(fields: [subjectId], references: [id])
+  IdUser        User       @relation(fields: [UserId], references: [id])
+  teacher       Teacher  @relation(fields: [teacherId], references: [id]) 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
 
 model Teacher{
+  id          String   @id @default(uuid())
+  name        String
+  evaluations Evaluate[]
+  subjects    Subject[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Subject{
   id        String   @id @default(uuid())
   name      String
-  subjects   String[]
+  teachers  Teacher[]
   evaluations Evaluate[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-}
+} 

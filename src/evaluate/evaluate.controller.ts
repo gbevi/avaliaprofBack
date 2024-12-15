@@ -13,7 +13,6 @@ import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 export class EvaluateController {
    constructor(
      private readonly evaluateService: EvaluateService,
-     private readonly authService: AuthService,
    ) {}
 
     @Post()
