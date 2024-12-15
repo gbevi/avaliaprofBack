@@ -6,6 +6,7 @@ import { IsPublic } from 'src/auth/decorators/is-public.decorator';
 import { AuthService } from 'src/auth/auth.service';
 import { UserPayload } from 'src/auth/models/UserPayload';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import { Prisma } from '.prisma/client';
 
 
 
@@ -59,7 +60,11 @@ export class EvaluateController {
         if (existingEvaluation.UserId !== currentUser.id) {
             throw new Error('Você não tem permissão para atualizar esta avaliação');
         }
-        return this.evaluateService.update(id, updateEvaluateDto);
+        const updateData: Prisma.EvaluateUpdateInput = {
+            ...updateEvaluateDto,
+            subject: { connect: { id: updateEvaluateDto.subjectId } }
+        };
+        return this.evaluateService.update(id, updateData);
     }
     
     @Delete(':id')
