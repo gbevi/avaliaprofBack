@@ -3,16 +3,24 @@ import { TeacherService } from './teachers.service';
 import { CreateTeacherDto } from './dto/create-teacher.dto';
 import { UpdateTeacherDto } from './dto/update-teacher.dto';
 import { IsPublic } from 'src/auth/decorators/is-public.decorator';
+import { SubjectsService } from 'src/subjects/subjects.service';
 @IsPublic()
 @Controller('teacher')
 export class TeacherController {
-  constructor(private readonly teacherService: TeacherService) {}
+  constructor(
+    private readonly teacherService: TeacherService,
+    private readonly subjectsService: SubjectsService
+  ) {}
+  
 
   @IsPublic()
   @Post()
-  create(@Body(ValidationPipe) createTeacherDto: CreateTeacherDto) {
-    return this.teacherService.create(createTeacherDto);
-  }
+createTeacher(
+  @Body('name') name: string,
+  @Body('subjectNames') subjectNames?: string[],
+) {
+  return this.teacherService.create(name, subjectNames);
+}
 
   @IsPublic()
   @Get()
@@ -31,23 +39,17 @@ export class TeacherController {
     return this.teacherService.update(id, updateTeacherDto);
   }
 
-  @IsPublic()
+
   @Delete(':id')
     remove(@Param('id', ParseUUIDPipe) id: string) {
         return this.teacherService.remove(id);
     }
 
-  @Post(':id/subjects')
-  async addSubject(
-    @Param('id') teacherId: string,
-    @Body('subject') subject: string,
-  ): Promise<string> {
-    try {
-      await this.teacherService.addSubjectToTeacher(teacherId, subject, {});
-      return `Subject "${subject}" added to teacher with ID ${teacherId}`;
-    } catch (error) {
-      throw new Error(error.message);
+    @Patch(':teacherId/:subjectId')
+    addSubjectToTeacher(
+      @Param('teacherId') teacherId: string,
+      @Param('subjectId') subjectId: string,) {
+        return this.teacherService.addSubjectToTeacher(teacherId, subjectId);
     }
-  }
 
 }
