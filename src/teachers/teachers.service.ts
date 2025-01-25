@@ -41,7 +41,9 @@ export class TeacherService {
   }
 
   async findAll() {
-    return this.databaseService.teacher.findMany();
+    return this.databaseService.teacher.findMany({
+      include: { evaluations: true, subjects: true },
+    });
   }
 
   async findOne(id: string) {
