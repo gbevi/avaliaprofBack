@@ -6,7 +6,12 @@ import { NotFoundException } from '@nestjs/common';
 export class TeacherService {
   constructor(private readonly databaseService: DatabaseService) {}
 
-  async create(name: string, department: string, subjectNames?: string[]) {
+  async create(
+    name: string,
+    department: string,
+    subjectNames?: string[],
+    photo?: string,
+  ) {
     const subjectIds: string[] = [];
 
     if (subjectNames && subjectNames.length > 0) {
@@ -35,6 +40,7 @@ export class TeacherService {
       data: {
         name,
         department,
+        ...(photo && { photo }), // Save photo if provided
         subjects: { connect: subjectIds.map((id) => ({ id })) },
       },
     });
@@ -105,7 +111,6 @@ export class TeacherService {
       where: {
         name: {
           contains: searchTerm,
-          mode: 'insensitive',
         },
       },
       select: {

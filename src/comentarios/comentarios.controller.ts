@@ -33,7 +33,13 @@ export class ComentariosController {
         'Só é possível criar comentarios para si mesmo',
       );
     }
-    return this.comentariosService.create(createComentariosDto);
+    // Map DTO to ComentariosCreateInput, including 'user' and 'avaliacao' relations
+    const createInput = {
+      ...createComentariosDto,
+      user: { connect: { id: createComentariosDto.userId } },
+      avaliacao: { connect: { id: createComentariosDto.avaliacaoId } },
+    };
+    return this.comentariosService.create(createInput);
   }
 
   @IsPublic()

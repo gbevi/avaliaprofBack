@@ -1,9 +1,23 @@
-// eslint-disable-next-line prettier/prettier
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, ValidationPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseUUIDPipe,
+  ValidationPipe,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/Create-user.dto';
 import { UpdateUserDto } from './dto/Update-user.dto';
 import { IsPublic } from 'src/auth/decorators/is-public.decorator';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Multer } from 'multer';
+
 @IsPublic()
 @Controller('users')
 export class UsersController {
@@ -11,8 +25,13 @@ export class UsersController {
 
   @IsPublic()
   @Post()
-  create(@Body(ValidationPipe) createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  @UseInterceptors(FileInterceptor('photo'))
+  create(
+    @Body(ValidationPipe) createUserDto: CreateUserDto,
+    @UploadedFile() file: Multer.File,
+  ) {
+    const photo = file ? file.buffer.toString('base64') : undefined;
+    return this.usersService.create({ ...createUserDto, photo });
   }
 
   @Get()
@@ -26,9 +45,14 @@ export class UsersController {
   }
 
   @Patch(':id')
-  // eslint-disable-next-line prettier/prettier
-  update(@Param('id', ParseUUIDPipe) id: string, @Body(ValidationPipe) updateUserDto: UpdateUserDto) {
-    return this.usersService.update(id, updateUserDto);
+  @UseInterceptors(FileInterceptor('photo'))
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body(ValidationPipe) updateUserDto: UpdateUserDto,
+    @UploadedFile() file: Multer.File,
+  ) {
+    const photo = file ? file.buffer.toString('base64') : undefined;
+    return this.usersService.update(id, { ...updateUserDto, photo });
   }
 
   @Delete(':id')
